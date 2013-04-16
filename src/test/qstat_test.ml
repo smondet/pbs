@@ -23,7 +23,7 @@ Job Id: %s\n\
   Pbs_qstat.parse_qstat s1
   >>= fun qstat ->
   Pbs_qstat.get_status  qstat >>= begin function
-  | `Running -> return ()
+  | `running -> return ()
   | other ->
     fail_test "s1, get_status: wrong status: %s"
       (Pbs_qstat.sexp_of_status other |> Sexp.to_string_hum)
@@ -38,7 +38,7 @@ Job Id: %s\n\
   Pbs_qstat.parse_qstat s2
   >>= fun qstat ->
   Pbs_qstat.get_status  qstat >>= begin function
-  | `Queued -> return ()
+  | `queued -> return ()
   | other ->
     fail_test "s2, get_status: wrong status: %s"
       (Pbs_qstat.sexp_of_status other |> Sexp.to_string_hum)

@@ -36,14 +36,14 @@ let parse_qstat (s: string) : (t, _) Core.Std.Result.t =
   end
 
 type status = [
-  | `Completed
-  | `Exiting
-  | `Held
-  | `Moved
-  | `Queued
-  | `Running
-  | `Suspended
-  | `Waiting
+  | `completed
+  | `exiting
+  | `held
+  | `moved
+  | `queued
+  | `running
+  | `suspended
+  | `waiting
 ]
 with sexp
 
@@ -53,14 +53,14 @@ let get_status ((_, assoc): t) =
   let open Result in
   let fail e = fail (`qstat e) in
   match List.Assoc.find assoc "job_state" with
-  | Some "R" -> return `Running
-  | Some "Q" -> return `Queued
-  | Some "C" -> return `Completed
-  | Some "E" -> return `Exiting
-  | Some "H" -> return `Held
-  | Some "T" -> return `Moved
-  | Some "W" -> return `Waiting
-  | Some "S" -> return `Suspended
+  | Some "R" -> return `running
+  | Some "Q" -> return `queued
+  | Some "C" -> return `completed
+  | Some "E" -> return `exiting
+  | Some "H" -> return `held
+  | Some "T" -> return `moved
+  | Some "W" -> return `waiting
+  | Some "S" -> return `suspended
   | Some s -> fail (`unknown_status s)
   | None -> fail `job_state_not_found
 

@@ -20,14 +20,14 @@ val parse_qstat :
 *)
 
 type status = [
-  | `Completed
-  | `Exiting
-  | `Held
-  | `Moved
-  | `Queued
-  | `Running
-  | `Suspended
-  | `Waiting
+  | `completed
+  | `exiting
+  | `held
+  | `moved
+  | `queued
+  | `running
+  | `suspended
+  | `waiting
 ]
 (** High-level representation of a status. *)
 
