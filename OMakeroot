@@ -1,0 +1,91 @@
+
+open build/OCaml
+DefineCommandVars()
+
+.PHONY: clean install_library install uninstall uninstall_library \
+        tags doc_library doc web update_licenses
+
+USE_OCAMLFIND = true
+
+DEPENDENCIES[] = flow
+CAMLP4_PACKS[]= sexplib.syntax
+OCAMLPACKS[] = $(DEPENDENCIES) $(CAMLP4_PACKS)
+
+LIB_NAME= pbs
+
+LIB_VERSION= 0.1
+
+if $(not $(OCAMLFIND_EXISTS))
+  eprintln(This project requires ocamlfind, but is was not found.)
+  eprintln(You need to install ocamlfind and run "omake --configure".)
+  exit 1
+
+NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
+BYTE_ENABLED = true
+
+OCAMLFLAGS = -thread -bin-annot -annot -warn-error P
+OCAMLCFLAGS =
+OCAMLOPTFLAGS =
+OCAML_LINK_FLAGS +=
+OCAML_BYTE_LINK_FLAGS =
+OCAML_NATIVE_LINK_FLAGS =
+OCAMLFINDFLAGS = -syntax camlp4o
+
+clean:
+  rm -fr _build OMakefile.omc OMakeroot.omc .omakedb .omakedb.lock
+
+install: install_library
+uninstall: uninstall_library
+
+LIB_MODULES[] = pbs pbs_qstat
+SOURCES= $(add-wrapper src/lib/, .ml, $(LIB_MODULES))
+
+TAGS: $(SOURCES)
+      otags $(SOURCES)
+tags: TAGS
+
+update_licenses:
+  sh -c 'find src/ \( -name "*.ml" -o -name "*.mli" \) -exec headache -h LICENSE {} \;'
+
+doc: doc_library
+
+web: doc
+  rm -fr _web/doclib-dev
+  mkdir -p _web
+  cp -r _build/lib/doclib _web/doclib-dev
+  cp src/doc/style.css _web/
+  pandoc -s README.md -o _web/index.html -c ./style.css
+
+.SUBDIRS: .
+  if $(not $(file-exists _build/))
+    mkdir -p _build/lib _build/test
+  vmount(-l, src/, _build/)
+
+  .SUBDIRS: _build/lib/
+    .DEFAULT: $(OCamlLibrary $(LIB_NAME), $(LIB_MODULES))
+    REQUIRES=$(concat \,, $(DEPENDENCIES))
+    META:
+      echo "description = \"Wrapper around the Portable Batch Submission (PBS) system\"" > META
+      echo "version = \"$(LIB_VERSION)\"" >> META
+      echo "archive(byte) = \"$(LIB_NAME).cma\"" >> META
+      echo "archive(native) = \"$(LIB_NAME).cmxa\"" >> META
+      echo "requires = \"$(REQUIRES)\"" >> META
+    install_library: $(LIB_NAME).cma $(LIB_NAME).cmxa META uninstall_library
+      ocamlfind install $(LIB_NAME) META *.cm[iox] $(LIB_NAME).cma $(LIB_NAME).cmxa $(LIB_NAME).a
+    uninstall_library:
+      ocamlfind remove $(LIB_NAME)
+    doclib/index.html: $(LIB_NAME).cma
+      mkdir -p doclib
+      ocamlfind ocamldoc \
+        -syntax camlp4o -package $(concat \,, $(OCAMLPACKS)) \
+        -charset UTF-8 -d doclib/ -t "The PBS Library v. $(LIB_VERSION)" -html \
+        -keep-code -colorize-code *.mli *.ml -sort -I .
+    doc_library: doclib/index.html
+
+  .SUBDIRS: _build/test/
+    OCAML_LIBS = ../lib/$(LIB_NAME)
+    OCAMLINCLUDES += $(dir ../lib)
+    define_test(t) =
+      .DEFAULT: $(OCamlProgram $(t), $(t))
+    define_test(qstat_test)
+
