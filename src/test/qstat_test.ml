@@ -21,7 +21,9 @@ Job Id: 1526443.crunch.local\n\
   >>= fun qstat ->
   Pbs_qstat.get_status  qstat >>= begin function
   | `Running -> return ()
-  | other -> fail_test "s1, get_status: wrong status"
+  | other ->
+    fail_test "s1, get_status: wrong status: %s"
+      (Pbs_qstat.sexp_of_status other |> Sexp.to_string_hum)
   end
 
 let () =

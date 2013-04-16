@@ -35,6 +35,18 @@ let parse_qstat (s: string) : (t, _) Core.Std.Result.t =
     else return (official_job_id, oks)
   end
 
+type status = [
+  | `Completed
+  | `Exiting
+  | `Held
+  | `Moved
+  | `Queued
+  | `Running
+  | `Suspended
+  | `Waiting
+]
+with sexp
+
 (** Get the status of the job (this follows
     {{:http://linux.die.net/man/1/qstat-torque}the qstat-torque manpage}).*)
 let get_status ((_, assoc): t) =

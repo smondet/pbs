@@ -19,19 +19,28 @@ val parse_qstat :
     {{:http://pubs.opengroup.org/onlinepubs/9699919799/utilities/qstat.html}OpenGroup/qstat}).
 *)
 
+type status = [
+  | `Completed
+  | `Exiting
+  | `Held
+  | `Moved
+  | `Queued
+  | `Running
+  | `Suspended
+  | `Waiting
+]
+(** High-level representation of a status. *)
 
 val get_status :
   t ->
-  ([> `Completed
-   | `Exiting
-   | `Held
-   | `Moved
-   | `Queued
-   | `Running
-   | `Suspended
-   | `Waiting ],
+  (status,
    [> `qstat of
         [> `job_state_not_found | `unknown_status of string ] ])
     Core.Std.Result.t
 (** Get the status of the job (this follows
     {{:http://linux.die.net/man/1/qstat-torque}the qstat-torque manpage}).*)
+
+(** {2 Serialization } *)
+
+val status_of_sexp: Core.Std.Sexp.t -> status
+val sexp_of_status: status -> Core.Std.Sexp.t
