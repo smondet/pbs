@@ -64,3 +64,7 @@ let get_status ((_, assoc): t) =
   | Some s -> fail (`unknown_status s)
   | None -> fail `job_state_not_found
 
+let job_id (name, _) = name
+
+let raw_field (_, assoc) field = List.Assoc.find assoc field
+

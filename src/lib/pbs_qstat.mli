@@ -40,6 +40,12 @@ val get_status :
 (** Get the status of the job (this follows
     {{:http://linux.die.net/man/1/qstat-torque}the qstat-torque manpage}).*)
 
+val job_id: t -> string
+(** Get the “official PBS job ID” of the given job. *)
+
+val raw_field: t -> string -> string option
+(** Find a field in the output of [qstat]. *)
+
 (** {2 Serialization } *)
 
 val status_of_sexp: Core.Std.Sexp.t -> status
