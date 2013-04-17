@@ -42,8 +42,8 @@ let create
   let header =
     let resource_list =
       let {Time.Span.Parts. hr; min; sec; _ } = Time.Span.to_parts walltime in
-      sprintf "nodes=%d:ppn=%d,walltime=%d:%d:%d" nodes ppn hr min sec in
-    let opt o ~f = Option.value_map ~default:[] o ~f:(fun s -> [s]) in
+      sprintf "nodes=%d:ppn=%d,walltime=%02d:%02d:%02d" nodes ppn hr min sec in
+    let opt o ~f = Option.value_map ~default:[] o ~f:(fun s -> [f s]) in
 
     List.concat [
       [sprintf "#! %s!" shell];
