@@ -42,3 +42,6 @@ val sequence :
   ?stderr_path:string ->
   ?stdout_path:string ->
   ?nodes:int -> ?ppn:int -> string list -> t
+
+val to_string: t -> string
+

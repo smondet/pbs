@@ -17,6 +17,9 @@ module Program = struct
 
   let command_sequence tl = Sequence tl
 
+  let to_string = function
+  | Sequence l -> String.concat ~sep:"\n" (List.map l Command.to_string)
+
 end
 
 
@@ -59,6 +62,9 @@ let create
     ]
   in
   {header; content = program}
+
+let to_string { header; content } =
+  String.concat ~sep:"\n" header ^ "\n\n" ^ Program.to_string content ^ "\n"
 
 let make_create how_to ?name ?shell ?walltime ?email_user ?queue
     ?stderr_path ?stdout_path ?nodes ?ppn arg =
