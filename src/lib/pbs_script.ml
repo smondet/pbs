@@ -49,7 +49,7 @@ let create
     let opt o ~f = Option.value_map ~default:[] o ~f:(fun s -> [f s]) in
 
     List.concat [
-      [sprintf "#! %s!" shell];
+      [sprintf "#! %s" shell];
       begin match email_user with
       | `never -> []
       | `always email -> ["#PBS -m abe"; sprintf "#PBS -M %s" email]
