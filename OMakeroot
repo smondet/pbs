@@ -37,7 +37,7 @@ clean:
 install: install_library
 uninstall: uninstall_library
 
-LIB_MODULES[] = pbs pbs_qstat
+LIB_MODULES[] = pbs pbs_qstat pbs_script
 SOURCES= $(add-wrapper src/lib/, .ml, $(LIB_MODULES))
 
 TAGS: $(SOURCES)
