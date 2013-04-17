@@ -14,11 +14,39 @@ module Program = struct
 
   type t =
     | Sequence of Command.t list
+    | Monitored of string * Command.t list
+    | Concat of t * t
 
   let command_sequence tl = Sequence tl
 
-  let to_string = function
+  let monitored_command_sequence ~with_file tl = Monitored (with_file, tl)
+
+  let and_then t t = Concat (t, t)
+
+  let rec to_string = function
   | Sequence l -> String.concat ~sep:"\n" (List.map l Command.to_string)
+  | Concat (t1, t2) ->
+    to_string t1 ^ "\n\n" ^ to_string t2
+  | Monitored (messages_path, l) ->
+    let date_rfc3339 = "date  '+%Y-%m-%d %H:%M:%S.%N%:z'" in
+    let cmd_count = ref 0 in
+    let checked_command s =
+      incr cmd_count;
+      sprintf "echo \"Begin: #%d $(%s) @\" %S >> %s\n\
+               %s\n\
+               return_code=$?\n\
+               if [ $return_code -ne 0 ]; then\n\
+              \    echo \"Command #%d failed on $(%s) with return code: $return_code @\" %S >> %s\n\
+              \    exit $return_code\n\
+               fi\n\
+               echo \"End: #%d $(%s) @\" %S >> %s\n\
+              "
+        !cmd_count date_rfc3339 (Command.to_string s) messages_path
+        (Command.to_string s)
+        !cmd_count date_rfc3339 (Command.to_string s) messages_path
+        !cmd_count date_rfc3339 (Command.to_string s) messages_path
+    in
+    String.concat ~sep:"\n" (List.map l ~f:checked_command)
 
 end
 
@@ -72,5 +100,10 @@ let make_create how_to ?name ?shell ?walltime ?email_user ?queue
     ?stdout_path ?nodes ?ppn (how_to arg)
 
 let sequence =
-  make_create (fun sl -> Program.(Command.(command_sequence (List.map sl of_string))))
+  make_create (fun sl ->
+    Program.(Command.(command_sequence (List.map sl of_string))))
 
+let monitored_sequence ~with_file =
+  make_create (fun sl ->
+    Program.(Command.(monitored_command_sequence ~with_file
+          (List.map sl of_string))))

@@ -12,6 +12,7 @@ module Program: sig
   type t
 
   val command_sequence: Command.t list -> t
+  val monitored_command_sequence: with_file:string -> Command.t list -> t
 
 end
 
@@ -34,6 +35,17 @@ val create :
 
 
 val sequence :
+  ?name:string ->
+  ?shell:string ->
+  ?walltime:Core.Std.Time.Span.t ->
+  ?email_user:emailing ->
+  ?queue:string ->
+  ?stderr_path:string ->
+  ?stdout_path:string ->
+  ?nodes:int -> ?ppn:int -> string list -> t
+
+val monitored_sequence:
+  with_file:string ->
   ?name:string ->
   ?shell:string ->
   ?walltime:Core.Std.Time.Span.t ->
