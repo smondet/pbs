@@ -5,7 +5,7 @@ module Command = struct
 
   type t = string
 
-  let of_string s = s
+  let of_string (s : string)= (s : t)
   let to_string s = s
 
 end
@@ -25,16 +25,20 @@ type t = {
   content: Program.t;
 }
 
+type emailing = [
+  | `never
+  | `always of string
+]
 
-let basic
+let create
   ?name
   ?(shell="/bin/bash")
   ?(walltime=Time.Span.day)
-  ?(email_user=`never)
+  ?(email_user: emailing=`never)
   ?queue
   ?stderr_path
   ?stdout_path
-  ?(nodes=1) ?(ppn=1) content =
+  ?(nodes=1) ?(ppn=1) program =
   let header =
     let resource_list =
       let {Time.Span.Parts. hr; min; sec; _ } = Time.Span.to_parts walltime in
@@ -54,4 +58,13 @@ let basic
       opt queue ~f:(sprintf "#PBS -q %s");
     ]
   in
-  {header; content}
+  {header; content = program}
+
+let make_create how_to ?name ?shell ?walltime ?email_user ?queue
+    ?stderr_path ?stdout_path ?nodes ?ppn arg =
+  create ?name ?shell ?walltime ?email_user ?queue ?stderr_path
+    ?stdout_path ?nodes ?ppn (how_to arg)
+
+let sequence =
+  make_create (fun sl -> Program.(Command.(command_sequence (List.map sl of_string))))
+
