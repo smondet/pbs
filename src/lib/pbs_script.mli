@@ -26,6 +26,12 @@ type emailing = [
 
 type array_index = [ `index of int | `range of int * int ]
 
+type dependency = [
+  | `after_ok of string
+  | `after_not_ok of string
+  | `after of string
+]
+
 val create :
   ?name:string ->
   ?shell:string ->
@@ -35,6 +41,7 @@ val create :
   ?stderr_path:string ->
   ?stdout_path:string ->
   ?array_indexes:array_index list ->
+  ?dependencies:dependency list ->
   ?nodes:int -> ?ppn:int -> Program.t -> t
 
 
@@ -47,6 +54,7 @@ val sequence :
   ?stderr_path:string ->
   ?stdout_path:string ->
   ?array_indexes:array_index list ->
+  ?dependencies:dependency list ->
   ?nodes:int -> ?ppn:int -> string list -> t
 
 val monitored_sequence:
@@ -59,6 +67,7 @@ val monitored_sequence:
   ?stderr_path:string ->
   ?stdout_path:string ->
   ?array_indexes:array_index list ->
+  ?dependencies:dependency list ->
   ?nodes:int -> ?ppn:int -> string list -> t
 
 val array_sequence:
@@ -70,6 +79,7 @@ val array_sequence:
   ?stderr_path:string ->
   ?stdout_path:string ->
   ?array_indexes:array_index list ->
+  ?dependencies:dependency list ->
   ?nodes:int -> ?ppn:int -> (string -> string list) -> t
 
 val to_string: t -> string

@@ -66,6 +66,11 @@ type emailing = [
 ]
 type array_index = [ `index of int | `range of int * int ]
 
+type dependency = [
+  | `after_ok of string
+  | `after_not_ok of string
+  | `after of string
+]
 let create
   ?name
   ?(shell="/bin/bash")
@@ -75,6 +80,7 @@ let create
   ?stderr_path
   ?stdout_path
   ?(array_indexes: array_index list option)
+  ?(dependencies: dependency list option)
   ?(nodes=1) ?(ppn=1) program =
   let header =
     let resource_list =
@@ -95,10 +101,17 @@ let create
       opt queue ~f:(sprintf "#PBS -q %s");
       opt array_indexes ~f:(fun indexes ->
         sprintf "#PBS -t %s"
-        (List.map indexes ~f:(function
-         | `index i -> Int.to_string i
-         | `range (l, h) -> sprintf "%d-%d" l h)
-         |> String.concat ~sep:","));
+          (List.map indexes ~f:(function
+           | `index i -> Int.to_string i
+           | `range (l, h) -> sprintf "%d-%d" l h)
+           |> String.concat ~sep:","));
+      opt dependencies ~f:(fun deps ->
+        sprintf "#PBS -W %s"
+          (List.map deps ~f:(function
+           | `after id -> sprintf "depend=afterany:%s" id
+           | `after_ok id -> sprintf "depend=afterok:%s" id
+           | `after_not_ok id -> sprintf "depend=afternotok:%s" id)
+           |> String.concat ~sep:","));
     ]
   in
   {header; content = program}
@@ -107,9 +120,9 @@ let to_string { header; content } =
   String.concat ~sep:"\n" header ^ "\n\n" ^ Program.to_string content ^ "\n"
 
 let make_create how_to ?name ?shell ?walltime ?email_user ?queue
-    ?stderr_path ?stdout_path ?array_indexes ?nodes ?ppn arg =
+    ?stderr_path ?stdout_path ?array_indexes ?dependencies ?nodes ?ppn arg =
   create ?name ?shell ?walltime ?email_user ?queue ?stderr_path
-    ?array_indexes ?stdout_path ?nodes ?ppn (how_to arg)
+    ?array_indexes ?stdout_path  ?dependencies ?nodes ?ppn (how_to arg)
 
 let sequence =
   make_create (fun sl ->
