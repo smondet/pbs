@@ -64,6 +64,7 @@ type emailing = [
   | `never
   | `always of string
 ]
+type array_index = [ `index of int | `range of int * int ]
 
 let create
   ?name
@@ -73,6 +74,7 @@ let create
   ?queue
   ?stderr_path
   ?stdout_path
+  ?(array_indexes: array_index list option)
   ?(nodes=1) ?(ppn=1) program =
   let header =
     let resource_list =
@@ -91,6 +93,12 @@ let create
       opt stdout_path ~f:(sprintf "#PBS -o %s");
       opt name ~f:(sprintf "#PBS -N %s");
       opt queue ~f:(sprintf "#PBS -q %s");
+      opt array_indexes ~f:(fun indexes ->
+        sprintf "#PBS -t %s"
+        (List.map indexes ~f:(function
+         | `index i -> Int.to_string i
+         | `range (l, h) -> sprintf "%d-%d" l h)
+         |> String.concat ~sep:","));
     ]
   in
   {header; content = program}
@@ -99,9 +107,9 @@ let to_string { header; content } =
   String.concat ~sep:"\n" header ^ "\n\n" ^ Program.to_string content ^ "\n"
 
 let make_create how_to ?name ?shell ?walltime ?email_user ?queue
-    ?stderr_path ?stdout_path ?nodes ?ppn arg =
+    ?stderr_path ?stdout_path ?array_indexes ?nodes ?ppn arg =
   create ?name ?shell ?walltime ?email_user ?queue ?stderr_path
-    ?stdout_path ?nodes ?ppn (how_to arg)
+    ?array_indexes ?stdout_path ?nodes ?ppn (how_to arg)
 
 let sequence =
   make_create (fun sl ->
