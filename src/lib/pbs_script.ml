@@ -16,12 +16,15 @@ module Program = struct
     | Sequence of Command.t list
     | Monitored of string * Command.t list
     | Concat of t * t
+    | Array_item of (string -> t)
 
   let command_sequence tl = Sequence tl
 
   let monitored_command_sequence ~with_file tl = Monitored (with_file, tl)
 
   let and_then t t = Concat (t, t)
+
+  let array_item f = Array_item f
 
   let rec to_string = function
   | Sequence l -> String.concat ~sep:"\n" (List.map l Command.to_string)
@@ -47,6 +50,7 @@ module Program = struct
         !cmd_count date_rfc3339 (Command.to_string s) messages_path
     in
     String.concat ~sep:"\n" (List.map l ~f:checked_command)
+  | Array_item make -> make "$PBS_ARRAYID" |> to_string
 
 end
 
@@ -107,3 +111,9 @@ let monitored_sequence ~with_file =
   make_create (fun sl ->
     Program.(Command.(monitored_command_sequence ~with_file
           (List.map sl of_string))))
+
+let array_sequence =
+  make_create (fun f ->
+    Program.(Command.(array_item (fun s ->
+          f s |> List.map ~f:of_string |> command_sequence))))
+

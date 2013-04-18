@@ -13,6 +13,7 @@ module Program: sig
 
   val command_sequence: Command.t list -> t
   val monitored_command_sequence: with_file:string -> Command.t list -> t
+  val array_item: (string -> t) -> t
 
 end
 
@@ -54,6 +55,16 @@ val monitored_sequence:
   ?stderr_path:string ->
   ?stdout_path:string ->
   ?nodes:int -> ?ppn:int -> string list -> t
+
+val array_sequence:
+  ?name:string ->
+  ?shell:string ->
+  ?walltime:Core.Std.Time.Span.t ->
+  ?email_user:emailing ->
+  ?queue:string ->
+  ?stderr_path:string ->
+  ?stdout_path:string ->
+  ?nodes:int -> ?ppn:int -> (string -> string list) -> t
 
 val to_string: t -> string
 
