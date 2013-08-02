@@ -7,7 +7,7 @@ DefineCommandVars()
 
 USE_OCAMLFIND = true
 
-DEPENDENCIES[] = flow
+DEPENDENCIES[] = core
 CAMLP4_PACKS[]= sexplib.syntax
 OCAMLPACKS[] = $(DEPENDENCIES) $(CAMLP4_PACKS)
 
@@ -88,4 +88,3 @@ web: doc
     define_test(t) =
       .DEFAULT: $(OCamlProgram $(t), $(t))
     define_test(qstat_test)
-

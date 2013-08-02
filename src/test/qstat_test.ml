@@ -1,5 +1,4 @@
 open Core.Std
-open Flow
 
 let test_parsing () =
   let open Result in

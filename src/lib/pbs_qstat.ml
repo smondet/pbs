@@ -1,5 +1,4 @@
 open Core.Std
-open Flow
 
 type t =  string * (string * string) list
 (** The output of [parse_qstat]: ["Job official ID", (key, value) list]. *)
@@ -67,4 +66,3 @@ let get_status ((_, assoc): t) =
 let job_id (name, _) = name
 
 let raw_field (_, assoc) field = List.Assoc.find assoc field
-
