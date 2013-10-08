@@ -3,9 +3,8 @@ ocaml-pbs
 
 Wrapper around PBS commands, and maybe some day protocol implementation
 
-Modules:
+Modules (available through the pack module `Pbs` or directly with their `Pbs_` name):
 
-- `Pbs` “pack-like” wrapper module
-- `Pbs_script` helper functions to generate PBS scripts
-- `Pbs_qstat` parse and manipulate the output of the `qstat` command
+- `Script` (a.k.a `Pbs_script`): functions to generate PBS scripts
+- `Qstat` (a.k.a. `Pbs_qstat`) parse and manipulate the output of the `qstat` command
 
