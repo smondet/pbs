@@ -48,11 +48,12 @@ update_licenses:
   sh -c 'find src/ \( -name "*.ml" -o -name "*.mli" \) -exec headache -h LICENSE {} \;'
 
 doc: doc_library
+  cp -r _build/lib/doclib/ _build/doc/
 
 web: doc
   rm -fr _web/doclib-dev
   mkdir -p _web
-  cp -r _build/lib/doclib _web/doclib-dev
+  cp -r _build/doc _web/doclib-dev
   cp src/doc/style.css _web/
   pandoc -s README.md -o _web/index.html -c ./style.css
 
