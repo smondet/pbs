@@ -3,7 +3,8 @@ module Command: sig
 
   type t
 
-  include Core.Stringable.S with type t := t
+  val to_string: t -> string
+  val of_string: string -> t
 
 end
 
@@ -32,10 +33,14 @@ type dependency = [
   | `after of string
 ]
 
+type timespan = [
+  | `hours of float
+]
+
 val create :
   ?name:string ->
   ?shell:string ->
-  ?walltime:Core.Std.Time.Span.t ->
+  ?walltime:timespan ->
   ?email_user:emailing ->
   ?queue:string ->
   ?stderr_path:string ->
@@ -48,7 +53,7 @@ val create :
 val sequence :
   ?name:string ->
   ?shell:string ->
-  ?walltime:Core.Std.Time.Span.t ->
+  ?walltime:timespan ->
   ?email_user:emailing ->
   ?queue:string ->
   ?stderr_path:string ->
@@ -61,7 +66,7 @@ val monitored_sequence:
   with_file:string ->
   ?name:string ->
   ?shell:string ->
-  ?walltime:Core.Std.Time.Span.t ->
+  ?walltime:timespan ->
   ?email_user:emailing ->
   ?queue:string ->
   ?stderr_path:string ->
@@ -73,7 +78,7 @@ val monitored_sequence:
 val array_sequence:
   ?name:string ->
   ?shell:string ->
-  ?walltime:Core.Std.Time.Span.t ->
+  ?walltime:timespan ->
   ?email_user:emailing ->
   ?queue:string ->
   ?stderr_path:string ->

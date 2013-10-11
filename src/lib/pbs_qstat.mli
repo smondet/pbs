@@ -9,9 +9,9 @@ val parse_qstat :
   (t,
    [> `qstat of
         [> `no_header of string
-        | `wrong_header_format of Core.Std.String.t
-        | `wrong_lines of Core.Std.String.t Core.Std.List.t ] ])
-    Core.Std.Result.t
+        | `wrong_header_format of String.t
+        | `wrong_lines of String.t list ] ])
+    Pvem.Result.t
 (** Parse the output of [qstat -f1 <job-id>] (for now this does not
     handle output for multiple jobs).
 
@@ -36,7 +36,7 @@ val get_status :
   (status,
    [> `qstat of
         [> `job_state_not_found | `unknown_status of string ] ])
-    Core.Std.Result.t
+    Pvem.Result.t
 (** Get the status of the job (this follows
     {{:http://linux.die.net/man/1/qstat-torque}the qstat-torque manpage}).*)
 
@@ -48,5 +48,5 @@ val raw_field: t -> string -> string option
 
 (** {2 Serialization } *)
 
-val status_of_sexp: Core.Std.Sexp.t -> status
-val sexp_of_status: status -> Core.Std.Sexp.t
+val status_of_sexp: Sexplib.Sexp.t -> status
+val sexp_of_status: status -> Sexplib.Sexp.t

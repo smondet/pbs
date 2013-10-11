@@ -1,5 +1,6 @@
-open Core.Std
-open Result
+
+open Pbs_internal_pervasives
+
 
 module Command = struct
 
@@ -71,10 +72,14 @@ type dependency = [
   | `after_not_ok of string
   | `after of string
 ]
+type timespan = [
+  | `hours of float
+]
+
 let create
   ?name
   ?(shell="/bin/bash")
-  ?(walltime=Time.Span.day)
+  ?(walltime=`hours 12.)
   ?(email_user: emailing=`never)
   ?queue
   ?stderr_path
@@ -84,8 +89,11 @@ let create
   ?(nodes=1) ?(ppn=1) program =
   let header =
     let resource_list =
-      let {Time.Span.Parts. hr; min; sec; _ } = Time.Span.to_parts walltime in
-      sprintf "nodes=%d:ppn=%d,walltime=%02d:%02d:%02d" nodes ppn hr min sec in
+      match walltime with
+      | `hours h ->
+        let hr = floor (abs_float h) in
+        let min = floor ((abs_float h -. hr) *. 60.) in
+        sprintf "nodes=%d:ppn=%d,walltime=%02f:%02f:00" nodes ppn hr min in
     let opt o ~f = Option.value_map ~default:[] o ~f:(fun s -> [f s]) in
 
     List.concat [

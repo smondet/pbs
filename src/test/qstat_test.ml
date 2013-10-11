@@ -1,4 +1,9 @@
-open Core.Std
+open Pbs_internal_pervasives
+open Sexplib
+open Sexplib.Std
+
+let say fmt =
+  ksprintf (fun s -> printf "QStat-test: %s\n%!" s) fmt
 
 let test_parsing () =
   let open Result in
@@ -19,6 +24,7 @@ Job Id: %s\n\
   in
   let id = "12345.crunch.local"  in
   let s1 = some_status ~id ~status:"R" in
+  (* dbg "s1: %S" s1; *)
   Pbs_qstat.parse_qstat s1
   >>= fun qstat ->
   Pbs_qstat.get_status  qstat >>= begin function
@@ -62,9 +68,9 @@ Job Id: %s\n\
   let s3 = some_status ~id ~status:"Q\nROGUE LINE\n" in
   Pbs_qstat.parse_qstat s3
   |> begin function
-  | Ok _ -> fail_test "s3 should not be parsable"
-  | Error (`qstat (`wrong_lines _)) -> return ()
-  | Error (`qstat _) -> fail_test "other error for s3"
+  | `Ok _ -> fail_test "s3 should not be parsable"
+  | `Error (`qstat (`wrong_lines _)) -> return ()
+  | `Error (`qstat _) -> fail_test "other error for s3"
   end
   >>= fun () ->
   return ()
@@ -72,16 +78,16 @@ Job Id: %s\n\
 
 let () =
   match test_parsing () with
-  | Ok () -> eprintf "Done.\n%!"
-  | Error e ->
-    eprintf "TEST FAILED:\n%s\n%!"
+  | `Ok () -> say "Done."
+  | `Error e ->
+    say "TEST FAILED:\n%s"
       (e |>
        <:sexp_of<
          [> `qstat of
               [> `job_state_not_found
                | `no_header of string
                | `unknown_status of string
-               | `wrong_header_format of Core.Std.String.t
-               | `wrong_lines of Core.Std.String.t Core.Std.List.t ]
+               | `wrong_header_format of string
+               | `wrong_lines of string list ]
           | `test_failure of string ]
        >> |> Sexp.to_string_hum)
