@@ -8,7 +8,7 @@ DefineCommandVars()
 USE_OCAMLFIND = true
 
 DEPENDENCIES[] = sosa nonstd pvem
-CAMLP4_PACKS[]= sexplib.syntax
+CAMLP4_PACKS[]= odn.with.syntax
 OCAMLPACKS[] = $(DEPENDENCIES) $(CAMLP4_PACKS)
 
 LIB_NAME= pbs

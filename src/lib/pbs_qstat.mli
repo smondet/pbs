@@ -46,7 +46,5 @@ val job_id: t -> string
 val raw_field: t -> string -> string option
 (** Find a field in the output of [qstat]. *)
 
-(** {2 Serialization } *)
-
-val status_of_sexp: Sexplib.Sexp.t -> status
-val sexp_of_status: status -> Sexplib.Sexp.t
+val status_to_string_hum: status -> string
+(** Get a human-readable string for a given status. *)

@@ -1,6 +1,4 @@
 open Pbs_internal_pervasives
-open Sexplib
-open Sexplib.Std
 
 let say fmt =
   ksprintf (fun s -> printf "QStat-test: %s\n%!" s) fmt
@@ -31,7 +29,7 @@ Job Id: %s\n\
   | `running -> return ()
   | other ->
     fail_test "s1, get_status: wrong status: %s"
-      (Pbs_qstat.sexp_of_status other |> Sexp.to_string_hum)
+      (Pbs_qstat.status_to_string_hum other)
   end
   >>= fun () ->
   begin match Pbs_qstat.job_id qstat with
@@ -46,7 +44,7 @@ Job Id: %s\n\
   | `queued -> return ()
   | other ->
     fail_test "s2, get_status: wrong status: %s"
-      (Pbs_qstat.sexp_of_status other |> Sexp.to_string_hum)
+      (Pbs_qstat.status_to_string_hum other)
   end
   >>= fun () ->
   begin match Pbs_qstat.job_id qstat with
@@ -75,19 +73,21 @@ Job Id: %s\n\
   >>= fun () ->
   return ()
 
+open ODN
+let odn_of_exn e = ODN.STR (Printexc.to_string e)
+type final_error = 
+  [ `qstat of
+      [ `job_state_not_found
+      | `no_header of string
+      | `unknown_status of string
+      | `wrong_header_format of string
+      | `wrong_lines of string list ]
+  | `test_failure of string ]
+with odn
 
 let () =
   match test_parsing () with
-  | `Ok () -> say "Done."
+  | `Ok () -> say "Done."; exit 0
   | `Error e ->
-    say "TEST FAILED:\n%s"
-      (e |>
-       <:sexp_of<
-         [> `qstat of
-              [> `job_state_not_found
-               | `no_header of string
-               | `unknown_status of string
-               | `wrong_header_format of string
-               | `wrong_lines of string list ]
-          | `test_failure of string ]
-       >> |> Sexp.to_string_hum)
+    say "TEST FAILED:\n%s" (ODN.string_of_odn (odn_of_final_error e));
+    exit 1

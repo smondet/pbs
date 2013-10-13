@@ -55,7 +55,6 @@ type status = [
   | `suspended
   | `waiting
 ]
-with sexp
 
 (** Get the status of the job (this follows
     {{:http://linux.die.net/man/1/qstat-torque}the qstat-torque manpage}).*)
@@ -79,3 +78,13 @@ let job_id (name, _) = name
 let raw_field (_, assoc) field = 
   List.find assoc (fun (k, _) -> k = field)
   |> Option.map ~f:snd
+
+let status_to_string_hum = function
+| `completed   -> "completed"
+| `exiting     -> "exiting"
+| `held        -> "held"
+| `moved       -> "moved"
+| `queued      -> "queued"
+| `running     -> "running"
+| `suspended   -> "suspended"
+| `waiting     -> "waiting"
