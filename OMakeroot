@@ -23,7 +23,7 @@ if $(not $(OCAMLFIND_EXISTS))
 NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
 BYTE_ENABLED = true
 
-OCAMLFLAGS = -thread -bin-annot -annot -warn-error P -absname
+OCAMLFLAGS = -bin-annot -annot -warn-error P -absname
 OCAMLCFLAGS =
 OCAMLOPTFLAGS =
 OCAML_LINK_FLAGS +=
