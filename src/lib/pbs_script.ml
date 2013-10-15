@@ -91,9 +91,10 @@ let create
     let resource_list =
       match walltime with
       | `hours h ->
-        let hr = floor (abs_float h) in
+        let hr = floor (abs_float h)  in
         let min = floor ((abs_float h -. hr) *. 60.) in
-        sprintf "nodes=%d:ppn=%d,walltime=%02f:%02f:00" nodes ppn hr min in
+        sprintf "nodes=%d:ppn=%d,walltime=%02d:%02d:00"
+          nodes ppn (int_of_float hr) (int_of_float min) in
     let opt o ~f = Option.value_map ~default:[] o ~f:(fun s -> [f s]) in
 
     List.concat [
