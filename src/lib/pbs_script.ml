@@ -14,6 +14,7 @@ end
 module Program = struct
 
   type t =
+    | Raw of string
     | Sequence of Command.t list
     | Monitored of string * Command.t list
     | Concat of t * t
@@ -27,7 +28,10 @@ module Program = struct
 
   let array_item f = Array_item f
 
+  let raw s = Raw s
+
   let rec to_string = function
+  | Raw s -> s
   | Sequence l -> String.concat ~sep:"\n" (List.map l Command.to_string)
   | Concat (t1, t2) ->
     to_string t1 ^ "\n\n" ^ to_string t2
@@ -132,6 +136,9 @@ let make_create how_to ?name ?shell ?walltime ?email_user ?queue
     ?stderr_path ?stdout_path ?array_indexes ?dependencies ?nodes ?ppn arg =
   create ?name ?shell ?walltime ?email_user ?queue ?stderr_path
     ?array_indexes ?stdout_path  ?dependencies ?nodes ?ppn (how_to arg)
+
+let raw =
+  make_create (fun s -> Program.(raw s))
 
 let sequence =
   make_create (fun sl ->

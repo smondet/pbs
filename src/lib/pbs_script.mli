@@ -62,6 +62,19 @@ val sequence :
   ?dependencies:dependency list ->
   ?nodes:int -> ?ppn:int -> string list -> t
 
+val raw :
+  ?name:string ->
+  ?shell:string ->
+  ?walltime:timespan ->
+  ?email_user:emailing ->
+  ?queue:string ->
+  ?stderr_path:string ->
+  ?stdout_path:string ->
+  ?array_indexes:array_index list ->
+  ?dependencies:dependency list ->
+  ?nodes:int -> ?ppn:int -> string -> t
+(** Create a PBS script based on a “raw” string as the program. *)
+
 val monitored_sequence:
   with_file:string ->
   ?name:string ->
