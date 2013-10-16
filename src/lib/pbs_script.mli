@@ -21,20 +21,20 @@ end
 type t
 
 type emailing = [
-  | `never
-  | `always of string
+  | `Never
+  | `Always of string
 ]
 
-type array_index = [ `index of int | `range of int * int ]
+type array_index = [ `Index of int | `Range of int * int ]
 
 type dependency = [
-  | `after_ok of string
-  | `after_not_ok of string
-  | `after of string
+  | `After_ok of string
+  | `After_not_ok of string
+  | `After of string
 ]
 
 type timespan = [
-  | `hours of float
+  | `Hours of float
 ]
 
 val create :

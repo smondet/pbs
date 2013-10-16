@@ -62,25 +62,25 @@ type t = {
 }
 
 type emailing = [
-  | `never
-  | `always of string
+  | `Never
+  | `Always of string
 ]
-type array_index = [ `index of int | `range of int * int ]
+type array_index = [ `Index of int | `Range of int * int ]
 
 type dependency = [
-  | `after_ok of string
-  | `after_not_ok of string
-  | `after of string
+  | `After_ok of string
+  | `After_not_ok of string
+  | `After of string
 ]
 type timespan = [
-  | `hours of float
+  | `Hours of float
 ]
 
 let create
   ?name
   ?(shell="/bin/bash")
-  ?(walltime=`hours 12.)
-  ?(email_user: emailing=`never)
+  ?(walltime=`Hours 12.)
+  ?(email_user: emailing=`Never)
   ?queue
   ?stderr_path
   ?stdout_path
@@ -90,7 +90,7 @@ let create
   let header =
     let resource_list =
       match walltime with
-      | `hours h ->
+      | `Hours h ->
         let hr = floor (abs_float h)  in
         let min = floor ((abs_float h -. hr) *. 60.) in
         sprintf "nodes=%d:ppn=%d,walltime=%02d:%02d:00"
@@ -100,8 +100,8 @@ let create
     List.concat [
       [sprintf "#! %s" shell];
       begin match email_user with
-      | `never -> []
-      | `always email -> ["#PBS -m abe"; sprintf "#PBS -M %s" email]
+      | `Never -> []
+      | `Always email -> ["#PBS -m abe"; sprintf "#PBS -M %s" email]
       end;
       [sprintf "#PBS -l %s" resource_list];
       opt stderr_path ~f:(sprintf "#PBS -e %s");
@@ -111,15 +111,15 @@ let create
       opt array_indexes ~f:(fun indexes ->
         sprintf "#PBS -t %s"
           (List.map indexes ~f:(function
-           | `index i -> Int.to_string i
-           | `range (l, h) -> sprintf "%d-%d" l h)
+           | `Index i -> Int.to_string i
+           | `Range (l, h) -> sprintf "%d-%d" l h)
            |> String.concat ~sep:","));
       opt dependencies ~f:(fun deps ->
         sprintf "#PBS -W %s"
           (List.map deps ~f:(function
-           | `after id -> sprintf "depend=afterany:%s" id
-           | `after_ok id -> sprintf "depend=afterok:%s" id
-           | `after_not_ok id -> sprintf "depend=afternotok:%s" id)
+           | `After id -> sprintf "depend=afterany:%s" id
+           | `After_ok id -> sprintf "depend=afterok:%s" id
+           | `After_not_ok id -> sprintf "depend=afternotok:%s" id)
            |> String.concat ~sep:","));
     ]
   in
