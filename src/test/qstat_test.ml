@@ -73,21 +73,13 @@ Job Id: %s\n\
   >>= fun () ->
   return ()
 
-open ODN
-let odn_of_exn e = ODN.STR (Printexc.to_string e)
-type final_error = 
-  [ `qstat of
-      [ `job_state_not_found
-      | `no_header of string
-      | `unknown_status of string
-      | `wrong_header_format of string
-      | `wrong_lines of string list ]
-  | `test_failure of string ]
-with odn
 
 let () =
   match test_parsing () with
   | `Ok () -> say "Done."; exit 0
   | `Error e ->
-    say "TEST FAILED:\n%s" (ODN.string_of_odn (odn_of_final_error e));
+    say "TEST FAILED:\n%s" 
+      (match e with
+      | `qstat _ as e -> sprintf "QStat error: %s" (Pbs_qstat.error_to_string e)
+      | `test_failure s -> sprintf "test_failure: %S" s);
     exit 1
