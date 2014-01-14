@@ -88,3 +88,15 @@ let status_to_string_hum = function
 | `running     -> "running"
 | `suspended   -> "suspended"
 | `waiting     -> "waiting"
+
+let error_to_string = function
+| `qstat e ->
+  begin match e with
+  | `job_state_not_found -> "job_state_not_found"
+  | `no_header s -> sprintf "no_header: %S" s
+  | `unknown_status s -> sprintf "unknown_status: %S" s
+  | `wrong_header_format s -> sprintf "wrong_header_format: %S" s
+  | `wrong_lines sl -> 
+    sprintf "wrong_lines: [%s]"
+      (List.map sl ~f:(sprintf "%S") |> String.concat ~sep:", ")
+  end

@@ -48,3 +48,12 @@ val raw_field: t -> string -> string option
 
 val status_to_string_hum: status -> string
 (** Get a human-readable string for a given status. *)
+
+val error_to_string :
+  [< `qstat of
+       [< `job_state_not_found
+       | `no_header of string
+       | `unknown_status of string
+       | `wrong_header_format of string
+       | `wrong_lines of string list ] ] -> string
+(** Get a human-readable representation of an error in this module. *)
