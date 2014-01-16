@@ -1,0 +1,34 @@
+BUILD INSTRUCTIONS
+==================
+
+Build
+-----
+
+You need the following libraries:
+
+- Library `nonstd` (opam package: `nonstd`)
+- Library `sosa` (opam package: `sosa`)
+- Library `pvem` (opam package: `pvem`)
+
+Then you can build the library:
+
+    omake
+
+Install
+-------
+
+You can install the library with `ocamlfind`:
+
+    omake install
+
+You may want to control the destination with the variable
+`OCAMLFIND_DESTDIR`.
+
+Uninstall
+---------
+
+You can uninstall the library (also `ocamlfind`):
+
+    omake uninstall
+
+
