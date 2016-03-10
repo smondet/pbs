@@ -83,7 +83,7 @@ type timespan = [
 let create
   ?name
   ?(shell="/bin/bash")
-  ?(walltime=`Hours 12.)
+  ?walltime
   ?(email_user: emailing=`Never)
   ?queue
   ?stderr_path
@@ -93,12 +93,14 @@ let create
   ?(nodes=1) ?(ppn=1) program =
   let header =
     let resource_list =
-      match walltime with
-      | `Hours h ->
-        let hr = floor (abs_float h)  in
-        let min = floor ((abs_float h -. hr) *. 60.) in
-        sprintf "nodes=%d:ppn=%d,walltime=%02d:%02d:00"
-          nodes ppn (int_of_float hr) (int_of_float min) in
+      let walltime = match walltime with
+        | Some (`Hours h) ->
+          let hr = floor (abs_float h)  in
+          let min = floor ((abs_float h -. hr) *. 60.) in
+          sprintf ",walltime=%02d:%02d:00" (int_of_float hr) (int_of_float min)
+        | None -> ""
+      in
+      sprintf "nodes=%d:ppn=%d%s" nodes ppn walltime in
     let opt o ~f = Option.value_map ~default:[] o ~f:(fun s -> [f s]) in
 
     List.concat [
